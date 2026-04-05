@@ -1,7 +1,7 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
-const protect = async (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
   let token;
 
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -17,9 +17,9 @@ const protect = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
+
     const user = await User.findById(decoded.id);
-    
+
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -56,19 +56,4 @@ const authorize = (...roles) => {
   };
 };
 
-const requirePermission = (permission) => {
-  return (req, res, next) => {
-    const { ROLE_PERMISSIONS } = require('../config/constants');
-    const userPermissions = ROLE_PERMISSIONS[req.user.role] || [];
-    
-    if (!userPermissions.includes(permission)) {
-      return res.status(403).json({
-        success: false,
-        message: `Permission denied. Your role '${req.user.role}' does not have '${permission}' permission`
-      });
-    }
-    next();
-  };
-};
-
-module.exports = { protect, authorize, requirePermission };
+export { authMiddleware, authorize };

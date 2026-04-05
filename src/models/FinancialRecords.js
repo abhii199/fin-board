@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const financialRecordSchema = new mongoose.Schema({
   user: {
@@ -47,9 +47,9 @@ financialRecordSchema.index({ user: 1, date: -1 });
 financialRecordSchema.index({ user: 1, category: 1 });
 financialRecordSchema.index({ user: 1, type: 1 });
 
-financialRecordSchema.pre(/^find/, function(next) {
+financialRecordSchema.pre(/^find/, function (next) {
   this.where({ isDeleted: false });
   next();
 });
 
-module.exports = mongoose.model('FinancialRecord', financialRecordSchema);
+export default mongoose.model('FinancialRecord', financialRecordSchema);
